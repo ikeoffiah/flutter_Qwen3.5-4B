@@ -26,6 +26,11 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  plugin:
+    platforms:
+      ios:
+        # FFI plugin: native lib loaded via DynamicLibrary.process()
+        # Host app must link the llama library (see ios/README.md).
 
   # To add assets to your package, add an assets section, like this:
   # assets:
