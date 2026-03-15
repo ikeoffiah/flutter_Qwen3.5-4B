@@ -1,9 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_qwen/flutter_qwen.dart';
-import 'package:flutter_qwen/src/model_manager.dart';
 
 void main() {
+  group('package export', () {
+    test('flutter_qwen exports Qwen, QwenConfig, kDefaultReasoningPrompt, IntegrityVerifier, QwenModelManager', () {
+      expect(Qwen(), isNotNull);
+      expect(const QwenConfig(), isNotNull);
+      expect(kDefaultReasoningPrompt, isNotEmpty);
+      expect(IntegrityVerifier.verify, isNotNull);
+      expect(QwenModelManager(), isNotNull);
+    });
+  });
+
   group('QwenConfig', () {
     test('default values', () {
       const config = QwenConfig();
@@ -112,6 +121,43 @@ void main() {
         qwen.initialize(),
         throwsStateError,
       );
+    });
+
+    test('StateError message asks to call initialize', () {
+      final qwen = Qwen();
+      try {
+        qwen.generate('Hi');
+        fail('expected StateError');
+      } on StateError catch (e) {
+        expect(e.message, contains('not initialized'));
+        expect(e.message.toLowerCase(), contains('initialize'));
+      }
+    });
+
+    test('after dispose isInitialized is false', () {
+      final qwen = Qwen();
+      expect(qwen.isInitialized, isFalse);
+      qwen.dispose();
+      expect(qwen.isInitialized, isFalse);
+    });
+
+    test('after dispose generate throws StateError', () {
+      final qwen = Qwen();
+      qwen.dispose();
+      expect(() => qwen.generate('Hi'), throwsStateError);
+    });
+
+    test('double dispose does not throw', () {
+      final qwen = Qwen();
+      qwen.dispose();
+      expect(() => qwen.dispose(), returnsNormally);
+    });
+
+    test('accepts custom model manager', () {
+      final manager = _EmptyPathModelManager();
+      final qwen = Qwen(modelManager: manager);
+      expect(qwen.config.contextLength, 4096);
+      expect(() => qwen.dispose(), returnsNormally);
     });
   });
 }

@@ -19,6 +19,27 @@ This package uses **Dart FFI** and loads the native llama.cpp library via `Dynam
 
 The plugin’s iOS deployment target is **12.0**. Your app’s minimum iOS version should be at least 12.0.
 
+## Testing iOS
+
+From the **package root** (`flutter_qwen/`):
+
+1. **Validate the podspec** (no simulator required):
+   ```bash
+   cd ios && pod lib lint flutter_qwen.podspec --allow-warnings --quick && cd ..
+   ```
+
+2. **Run the iOS plugin test file** (Dart tests; on a non‑iOS host this runs a single skip test; in an iOS test environment the iOS-specific tests run):
+   ```bash
+   flutter test test/ios_plugin_test.dart
+   ```
+
+3. **Run the full iOS check script** (pod lint + above test):
+   ```bash
+   bash scripts/test_ios.sh
+   ```
+
+4. **Full integration**: From an app that depends on this package, run `flutter build ios --no-codesign` and open `ios/Runner.xcworkspace` in Xcode to build and run on a simulator or device.
+
 ## Troubleshooting
 
 - **Undefined symbols for llama_…**  

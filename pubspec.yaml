@@ -29,9 +29,7 @@ flutter:
   plugin:
     platforms:
       ios:
-        # FFI plugin: native lib loaded via DynamicLibrary.process()
-        # Host app must link the llama library (see ios/README.md).
-
+        pluginClass: FlutterQwenPlugin
   # To add assets to your package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

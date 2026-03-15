@@ -16,8 +16,24 @@ void main() {
       expect(manager.modelPath, p.join('', 'Qwen3.5-4B-Q4_K_M.gguf'));
     });
 
+    test('modelPath is modelDir + filename when modelDir set', () {
+      final manager = _FixedPathModelManager('/tmp/qwen');
+      expect(manager.modelDir, '/tmp/qwen');
+      expect(manager.modelPath, p.join('/tmp/qwen', 'Qwen3.5-4B-Q4_K_M.gguf'));
+    });
+
     // isReady() and download() require path_provider (getApplicationDocumentsDirectory),
     // which is not available in unit test environment without plugin mocks.
     // Test those in integration tests or with path_provider_platform_interface mock.
   });
+}
+
+/// Manager with fixed modelDir for testing path join.
+class _FixedPathModelManager extends QwenModelManager {
+  _FixedPathModelManager(this._fixedDir);
+  final String _fixedDir;
+  @override
+  String get modelDir => _fixedDir;
+  @override
+  String get modelPath => p.join(_fixedDir, 'Qwen3.5-4B-Q4_K_M.gguf');
 }

@@ -34,6 +34,20 @@ void main() {
       );
     });
 
+    test('verify exception when file not found includes path', () async {
+      final path = '${tempDir.path}/missing.bin';
+      try {
+        await IntegrityVerifier.verify(
+          path: path,
+          expectedSha256: '0' * 64,
+        );
+        fail('expected Exception');
+      } on Exception catch (e) {
+        expect(e.toString(), contains('File not found'));
+        expect(e.toString(), contains('missing.bin'));
+      }
+    });
+
     test('verify throws when SHA256 does not match', () async {
       final file = File('${tempDir.path}/wrong_hash.bin');
       await file.writeAsString('hello');
@@ -81,6 +95,23 @@ void main() {
       );
 
       expect(file.existsSync(), isTrue);
+    });
+
+    test('verify SHA256 mismatch exception includes Expected and Actual', () async {
+      final file = File('${tempDir.path}/mismatch.bin');
+      await file.writeAsString('x');
+      try {
+        await IntegrityVerifier.verify(
+          path: file.path,
+          expectedSha256: 'a' * 64,
+        );
+        fail('expected Exception');
+      } on Exception catch (e) {
+        final msg = e.toString();
+        expect(msg, contains('SHA256 mismatch'));
+        expect(msg, contains('Expected:'));
+        expect(msg, contains('Actual:'));
+      }
     });
   });
 }
