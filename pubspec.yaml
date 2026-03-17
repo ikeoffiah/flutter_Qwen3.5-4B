@@ -28,6 +28,9 @@ dev_dependencies:
 flutter:
   plugin:
     platforms:
+      android:
+        package: dev.flutter.flutter_qwen
+        pluginClass: FlutterQwenPlugin
       ios:
         pluginClass: FlutterQwenPlugin
   # To add assets to your package, add an assets section, like this:
