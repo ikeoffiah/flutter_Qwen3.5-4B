@@ -31,8 +31,12 @@ const String kDefaultReasoningPrompt =
 /// qwen.dispose();
 /// ```
 class Qwen {
-  Qwen({QwenModelManager? modelManager, this.config = const QwenConfig()})
-      : _manager = modelManager ?? QwenModelManager();
+  Qwen({
+    QwenModelManager? modelManager,
+    LlamaEngine? engine,
+    this.config = const QwenConfig(),
+  })  : _manager = modelManager ?? QwenModelManager(),
+        _engine = engine;
 
   final QwenModelManager _manager;
   final QwenConfig config;
@@ -50,7 +54,7 @@ class Qwen {
   Future<void> initialize({
     void Function(double progress, String status)? onProgress,
   }) async {
-    if (_engine != null) return;
+    if (_backendInitialized) return;
 
     final ready = await _manager.isReady();
     if (!ready) await _manager.download(onProgress: onProgress);
@@ -58,7 +62,7 @@ class Qwen {
     final path = _manager.modelPath;
     if (path.isEmpty) throw StateError('Model path is empty after download');
 
-    _engine = LlamaEngine();
+    _engine ??= LlamaEngine();
     _engine!.initBackend();
     _backendInitialized = true;
 
