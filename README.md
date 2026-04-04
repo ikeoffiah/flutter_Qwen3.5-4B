@@ -1,39 +1,79 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# flutter_qwen
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A high-performance Flutter plugin for running Qwen3.5-4B models locally using GGUF and FFI.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- **Local Inference**: Run LLMs directly on-device without an internet connection.
+- **Streaming Support**: Real-time token generation for a responsive UI.
+- **Reasoning Mode**: Dedicated API for step-by-step thinking/CoT (Chain of Thought).
+- **Automated Model Management**: Handles download from Hugging Face and integrity verification (SHA256).
+- **Embeddings**: Extract vector embeddings from text for RAG or similarity search.
+- **Cross-Platform**: Designed for Android and iOS (via llama.cpp/FFI).
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add the package to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter_qwen: ^0.0.1
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+### Minimal Example
 
 ```dart
-const like = 'sample';
+final qwen = Qwen();
+
+// Download (if needed) and load the model
+await qwen.initialize(
+  onProgress: (progress, status) => print('$status: ${(progress * 100).round()}%'),
+);
+
+// Batch generation
+final response = qwen.generate('What is the capital of France?');
+print(response);
+
+// Streaming generation
+qwen.generateStream(
+  'Write a short poem about coding.',
+  onToken: (token) => print(token),
+);
+
+qwen.dispose();
 ```
+
+### Reasoning Mode
+
+To use the model's reasoning capabilities:
+
+```dart
+qwen.reasonStream(
+  'Solve for x: 2x + 5 = 15',
+  onToken: (token) {
+    // Process "thinking" tokens and final answer
+  },
+);
+```
+
+### Tokenization & Embeddings
+
+```dart
+final tokens = qwen.tokenize('Hello world');
+final embedding = qwen.getEmbedding();
+```
+
+## Example App
+
+Check out the [example](example/lib/main.dart) folder for a full-featured Chat UI implementation including:
+- Download progress tracking
+- Real-time streaming
+- Reasoning mode toggle
+- Reset and memory management
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+This package uses `llama.cpp` under the hood via FFI. Ensure your target device has sufficient RAM (at least 4GB recommended for Qwen3.5-4B).
+
